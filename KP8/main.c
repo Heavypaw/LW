@@ -15,13 +15,9 @@ int main() {
         head = insertNode(head, data);
     }
 
-    Iterator* it = createIterator(head);
+    // Use printList to display the nodes
     printf("nodes: ");
-    Node* node;
-    while ((node = next(it)) != NULL) {
-        printf("%zu ", node->data);
-    }
-    printf("\n");
+    printList(head);
 
     int count = countNodes(head);
     printf("#nodes: %d\n", count);
@@ -37,13 +33,15 @@ int main() {
     printf("delete middle 3: ");
     printList(head);
 
-    while (head != NULL) {
+    // Properly free the circular list
+    if (head != NULL) {
         Node* temp = head;
-        head = head->next;
-        free(temp);
+        do {
+            Node* next = temp->next;
+            free(temp);
+            temp = next;
+        } while (temp != head);
     }
-
-    free(it);
 
     return 0;
 }
