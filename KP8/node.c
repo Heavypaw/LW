@@ -26,36 +26,56 @@ Node* createNode(size_t data) {
 
 Node* insertNode(Node* head, size_t data) {
     Node* newNode = createNode(data);
-    newNode->next = head;
-    return newNode;
+    if (head == NULL) {
+        newNode->next = newNode; // Сам на себя, если это первый узел
+    } else {
+        Node* temp = head;
+        while (temp->next != head) { // Найти последний узел
+            temp = temp->next;
+        }
+        temp->next = newNode;
+        newNode->next = head;
+    }
+    return newNode; // новый узел становится головой
 }
 
 Node* deleteNode(Node* head, size_t key) {
+    if (head == NULL) return NULL;
+
     Node* temp = head, *prev = NULL;
-
-    if (temp != NULL && temp->data == key) {
-        head = temp->next;
-        free(temp);
-        return head;
-    }
-
-    while (temp != NULL && temp->data != key) {
+    do {
+        if (temp->data == key) {
+            if (prev == NULL) { // Удаление головы списка
+                if (temp->next == head) { // Единственный элемент
+                    free(temp);
+                    return NULL;
+                } else {
+                    Node* last = head;
+                    while (last->next != head) last = last->next;
+                    head = head->next;
+                    last->next = head;
+                    free(temp);
+                    return head;
+                }
+            } else {
+                prev->next = temp->next;
+                free(temp);
+                return head;
+            }
+        }
         prev = temp;
         temp = temp->next;
-    }
+    } while (temp != head);
 
-    if (temp == NULL) return head;
-
-    prev->next = temp->next;
-    free(temp);
-
-    return head;
+    return head; // Ключ не найден
 }
 
 int countNodes(Node* head) {
-    int count = 0;
-    Node* current = head;
-    while (current != NULL) {
+    if (head == NULL) return 0;
+
+    int count = 1;
+    Node* current = head->next;
+    while (current != head) {
         count++;
         current = current->next;
     }
@@ -63,15 +83,14 @@ int countNodes(Node* head) {
 }
 
 void printList(Node* head) {
-    Iterator* it = createIterator(head);
-    Node* current;
+    if (head == NULL) return;
 
-    while ((current = next(it)) != NULL) {
-        printf("%zu ", current->data);
-    }
+    Node* temp = head;
+    do {
+        printf("%zu ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
     printf("\n");
-
-    free(it);
 }
 
 Node* deleteMiddleXNodes(Node* head, int X) {
@@ -121,4 +140,3 @@ Node* deleteMiddleXNodes(Node* head, int X) {
 
     return head;
 }
-
